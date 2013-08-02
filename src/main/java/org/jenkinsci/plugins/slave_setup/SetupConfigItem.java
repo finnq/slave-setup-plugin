@@ -21,21 +21,6 @@ public class SetupConfigItem {
     private String prepareScript;
 
     /**
-     * the directory to get the content to copy from
-     */
-    private File filesDir;
-
-    /**
-     * the command line code
-     */
-    private String commandLine;
-
-    /**
-     * set to true to execute setup script on save of the main jenkins configuration page
-     */
-    private boolean deployNow;
-
-    /**
      * jenkins label to be assigned to this setup config
      */
     private String assignedLabelString;
@@ -49,17 +34,11 @@ public class SetupConfigItem {
      * Constructor uesd to create the setup config instance
      *
      * @param prepareScript
-     * @param filesDir
-     * @param commandLine
-     * @param deployNow
      * @param assignedLabelString
      */
     @DataBoundConstructor
-    public SetupConfigItem(String prepareScript, File filesDir, String commandLine, boolean deployNow, String assignedLabelString) {
+    public SetupConfigItem(String prepareScript, String assignedLabelString) {
         this.prepareScript = prepareScript;
-        this.filesDir = filesDir;
-        this.commandLine = commandLine;
-        this.deployNow = deployNow;
         this.assignedLabelString = assignedLabelString;
     }
 
@@ -85,64 +64,6 @@ public class SetupConfigItem {
      */
     public void setPrepareScript(String prepareScript) {
         this.prepareScript = prepareScript;
-    }
-
-    /**
-     * Returns the directory containing the setup relevant files and sub directories
-     *
-     * @return
-     */
-    public File getFilesDir() {
-        return filesDir;
-    }
-
-    /**
-     * Returns the command line code.
-     *
-     * @return the command line code
-     */
-    public String getCommandLine() {
-        return commandLine;
-    }
-
-    /**
-     * Returns true if the setup config should be deployed on save of the jenkins config page.
-     *
-     * @return true if the setup config should be deployed on save of the jenkins config page
-     */
-    public boolean getDeployNow() {
-        return this.deployNow;
-    }
-
-    /**
-     * Sets the files dir.
-     *
-     * @param filesDir firectory to copy the setup files and sub directories from.
-     */
-    public void setFilesDir(File filesDir) {
-        if (filesDir.getPath().length() == 0) {
-            this.filesDir = null;
-        } else {
-            this.filesDir = filesDir;
-        }
-    }
-
-    /**
-     * sets the command line code.
-     *
-     * @param commandLine the command line code
-     */
-    public void setCommandLine(String commandLine) {
-        this.commandLine = Util.fixEmpty(commandLine);
-    }
-
-    /**
-     * sets the deploy flag.
-     *
-     * @param deployNow the deploy flag
-     */
-    public void setDeployNow(boolean deployNow) {
-        this.deployNow = deployNow;
     }
 
     /**
