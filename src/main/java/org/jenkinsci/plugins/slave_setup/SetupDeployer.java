@@ -52,9 +52,9 @@ public class SetupDeployer {
     }
 
     /**
-     * Returns 0 if all prepare scripts were executes without error.
+     * Returns 0 if all prepare scripts were executed without error.
      *
-     * @return 0 if all prepare scripts were executes without error
+     * @return 0 if all prepare scripts were executed without error
      */
     public void executePrepareScripts(Computer c, SetupConfig config, TaskListener listener) {
         // execute prepare scripts on master relative to jenkins install dir
@@ -63,19 +63,15 @@ public class SetupDeployer {
 
         for (SetupConfigItem setupConfigItem : config.getSetupConfigItems()) {
             if (StringUtils.isBlank(setupConfigItem.getPrepareScript())) {
+                listener.getLogger().println("No prepare script given");
                 setupConfigItem.setPrepareScriptExecuted(true);
             } else {
-                // execute this config's prepare script if the target computer is not set (on save of the
-                // jenkins configuration page) or if the label expression of the config matches with the given
-                // computer.
-                if (c == null || this.checkLabels(c, setupConfigItem)) {
-                    try {
-                        this.executeScript(computer, filePath, listener, setupConfigItem.getPrepareScript());
-                        setupConfigItem.setPrepareScriptExecuted(true);
-                    } catch (Exception e) {
-                        listener.getLogger().println("prepare script failed with exception: " + e.getMessage());
-                        setupConfigItem.setPrepareScriptExecuted(false);
-                    }
+                try {
+                    this.executeScript(computer, filePath, listener, setupConfigItem.getPrepareScript());
+                    setupConfigItem.setPrepareScriptExecuted(true);
+                } catch (Exception e) {
+                    listener.getLogger().println("Execute prepare script failed with exception: " + e.getMessage());
+                    setupConfigItem.setPrepareScriptExecuted(false);
                 }
             }
         }
