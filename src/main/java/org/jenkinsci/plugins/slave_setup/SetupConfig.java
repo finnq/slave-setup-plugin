@@ -55,14 +55,6 @@ public class SetupConfig extends GlobalConfiguration {
         // execute prepareScripts
         deployer.executePrepareScripts(null, this, new LogTaskListener(LOGGER, Level.ALL));
 
-        List<Computer> allActiveSlaves = deployer.getAllActiveSlaves();
-
-        for (SetupConfigItem setupConfigItem : this.setupConfigItems) {
-            if(setupConfigItem.getDeployNow()) {
-                deployer.deployToComputers(allActiveSlaves, setupConfigItem);
-            }
-        }
-
         return true;
     }
 
