@@ -53,55 +53,6 @@ public class SetupDeployer {
     }
 
     /**
-     * @param c        the computer to upload th files to
-     * @param root     the computer's target directory
-     * @param listener the listener for logging etc.
-     * @param config   the SetupConfig object containing the all SetupConfigItems
-     * @throws IOException
-     * @throws InterruptedException
-     */
-    public void deployToComputer(Computer c, FilePath root, TaskListener listener, SetupConfig config) throws IOException, InterruptedException {
-        List<SetupConfigItem> setupConfigItems = config.getSetupConfigItems();
-
-        for (SetupConfigItem setupConfigItem : setupConfigItems) {
-            this.deployToComputer(c, root, listener, setupConfigItem);
-        }
-    }
-
-    /**
-     * @param c               the computer to upload th files to
-     * @param root            the computer's target directory
-     * @param listener        the listener for logging etc.
-     * @param setupConfigItem the SetupConfigItem object containing the source dir and the command line
-     * @throws IOException
-     * @throws InterruptedException
-     */
-    public void deployToComputer(Computer c, FilePath root, TaskListener listener, SetupConfigItem setupConfigItem) throws IOException, InterruptedException {
-        // do not deploy is prepare script for this setup config item did not work
-        if (!setupConfigItem.isPrepareScriptExecuted()) {
-            listener.getLogger().println("Slave NOT set up as prepare script was not executed successfully.");
-            return;
-        }
-
-        //do not deploy if label of computer and config do not match.
-        if (this.checkLabels(c, setupConfigItem)) {
-            // copy files
-            File sd = setupConfigItem.getFilesDir();
-            if (sd != null && StringUtils.isNotBlank(sd.getPath())) {
-                listener.getLogger().println("Copying setup script files from " + sd);
-                new FilePath(sd).copyRecursiveTo(root);
-            }
-
-            // execute command line
-            String cmdLine = setupConfigItem.getCommandLine();
-
-            executeScript(c, root, listener, cmdLine);
-        } else {
-            listener.getLogger().println("Slave " + c.getName() + " NOT set up as assigned label expression '" + setupConfigItem.getAssignedLabelString() + "' does not match with node label '" + c.getNode().getLabelString() + "'");
-        }
-    }
-
-    /**
      * Returns true if the given setup config item is responsible for the given slave computer.
      *
      * @param c               the slave computer
@@ -117,60 +68,6 @@ public class SetupDeployer {
         Label label = Label.get(setupConfigItem.getAssignedLabelString());
 
         return label.contains(c.getNode());
-    }
-
-    private void executeScript(Computer c, FilePath root, TaskListener listener, String cmdLine) throws IOException, InterruptedException {
-        if (StringUtils.isNotBlank(cmdLine)) {
-            listener.getLogger().println("Executing script '" + cmdLine + "' on " + c.getName());
-            Node node = c.getNode();
-            Launcher launcher = root.createLauncher(listener);
-            Shell s = new Shell(cmdLine);
-            FilePath script = s.createScriptFile(root);
-            int r = launcher.launch().cmds(s.buildCommandLine(script)).envs(getEnvironment(node)).stdout(listener).pwd(root).join();
-
-            if (r != 0) {
-                listener.getLogger().println("script failed!");
-                throw new AbortException("script failed!");
-            }
-
-            listener.getLogger().println("script executed successfully.");
-        }
-    }
-
-    /**
-     * @param computerList    the list of computers to upload the setup files and execute command line
-     * @param setupConfigItem the SetupConfigItem object
-     */
-    public void deployToComputers(List<Computer> computerList, SetupConfigItem setupConfigItem) {
-        for (Computer computer : computerList) {
-            try {
-                FilePath root = computer.getNode().getRootPath();
-                LogTaskListener listener = new LogTaskListener(LOGGER, Level.ALL);
-                this.deployToComputer(computer, root, listener, setupConfigItem);
-            } catch (IOException e) {
-                LOGGER.severe(e.getMessage());
-            } catch (InterruptedException e) {
-                LOGGER.severe(e.getMessage());
-            }
-        }
-    }
-
-    /**
-     * @param computerList the list of computers to upload the setup files and execute command line
-     * @param config       the SetupConfig object
-     */
-    public void deployToComputers(List<Computer> computerList, SetupConfig config) {
-        for (Computer computer : computerList) {
-            try {
-                FilePath root = computer.getNode().getRootPath();
-                LogTaskListener listener = new LogTaskListener(LOGGER, Level.ALL);
-                this.deployToComputer(computer, root, listener, config);
-            } catch (IOException e) {
-                LOGGER.severe(e.getMessage());
-            } catch (InterruptedException e) {
-                LOGGER.severe(e.getMessage());
-            }
-        }
     }
 
     /**
@@ -202,17 +99,5 @@ public class SetupDeployer {
             }
         }
     }
-
-    /**
-     * Returns the environment variables for the given node.
-     *
-     * @param node node to get the environment variables from
-     * @return the environment variables for the given node
-     */
-    private EnvVars getEnvironment(Node node) {
-        EnvironmentVariablesNodeProperty env = node.getNodeProperties().get(EnvironmentVariablesNodeProperty.class);
-        return env != null ? env.getEnvVars() : new EnvVars();
-    }
-
 
 }
