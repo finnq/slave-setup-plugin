@@ -22,35 +22,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Executes a deployment to all or a single node of the given fileset and executes the command line.
- *
- * @author Frederik Fromm
- */
 public class SetupDeployer {
-    /**
-     * the logger.
-     */
-    private static final Logger LOGGER = Logger.getLogger(SetupDeployer.class.getName());
-
-    /**
-     * Returns true if the given setup config item is responsible for the given slave computer.
-     *
-     * @param c               the slave computer
-     * @param setupConfigItem the setup config item to check
-     * @return true if the given setup config item is responsible for the given slave computer
-     */
-    public boolean checkLabels(Computer c, SetupConfigItem setupConfigItem) {
-        if (StringUtils.isBlank(setupConfigItem.getAssignedLabelString())) {
-            return true;
-        }
-
-        //Label l = Jenkins.getInstance().getLabel(setupConfigItem.getAssignedLabelString());
-        Label label = Label.get(setupConfigItem.getAssignedLabelString());
-
-        return label.contains(c.getNode());
-    }
-
     /**
      * Returns 0 if all prepare scripts were executed without error.
      *
@@ -76,5 +48,4 @@ public class SetupDeployer {
             }
         }
     }
-
 }
