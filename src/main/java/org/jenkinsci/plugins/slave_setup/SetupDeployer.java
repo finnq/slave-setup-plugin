@@ -34,25 +34,6 @@ public class SetupDeployer {
     private static final Logger LOGGER = Logger.getLogger(SetupDeployer.class.getName());
 
     /**
-     * Returns a list of all active slaves connected to the master.
-     *
-     * @return a list of all active slaves connected to the master
-     */
-    public List<Computer> getAllActiveSlaves() {
-        final List<Computer> computers = Arrays.asList(Jenkins.getInstance().getComputers());
-
-        List<Computer> activeComputers = new ArrayList<Computer>();
-
-        for (Computer computer : computers) {
-            if (!(computer instanceof Jenkins.MasterComputer) && computer.isOnline()) {
-                activeComputers.add(computer);
-            }
-        }
-
-        return activeComputers;
-    }
-
-    /**
      * Returns true if the given setup config item is responsible for the given slave computer.
      *
      * @param c               the slave computer
