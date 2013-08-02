@@ -8,9 +8,6 @@ import hudson.AbortException;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * @author Kohsuke Kawaguchi
- */
 @Extension
 public class ComputerListenerImpl extends ComputerListener {
 
@@ -22,11 +19,10 @@ public class ComputerListenerImpl extends ComputerListener {
      * @throws InterruptedException
      */
     @Override
-    public void preOnline(Computer c, TaskListener listener) throws AbortException, IOException, InterruptedException {
-        listener.getLogger().println("just before slave " + c.getName() + " gets online ...");
+    public void preLaunch(Computer c, TaskListener listener) throws AbortException, IOException, InterruptedException {
+        listener.getLogger().println("Start prepare script for" + c.getName() + " ...");
 
         SetupConfig config = SetupConfig.get();
-
         SetupDeployer deployer = new SetupDeployer();
 
         listener.getLogger().println("executing prepare script ...");
