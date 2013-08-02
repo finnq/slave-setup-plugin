@@ -26,7 +26,7 @@ public class ComputerListenerImpl extends ComputerListener {
      * @throws InterruptedException
      */
     @Override
-    public void preOnline(Computer c, Channel channel, FilePath root, TaskListener listener) throws IOException, InterruptedException {
+    public void preOnline(Computer c, Channel channel, TaskListener listener) throws IOException, InterruptedException {
         listener.getLogger().println("just before slave " + c.getName() + " gets online ...");
 
         SetupConfig config = SetupConfig.get();
@@ -35,9 +35,6 @@ public class ComputerListenerImpl extends ComputerListener {
 
         listener.getLogger().println("executing prepare script ...");
         deployer.executePrepareScripts(c, config, listener);
-
-        listener.getLogger().println("setting up slave " + c.getName() + " ...");
-        deployer.deployToComputer(c, root, listener, config);
 
         listener.getLogger().println("slave setup done.");
     }
