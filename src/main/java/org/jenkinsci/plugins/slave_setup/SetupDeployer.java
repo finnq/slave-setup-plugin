@@ -23,6 +23,24 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SetupDeployer {
+    private void executeScript(Computer c, FilePath root, TaskListener listener, String cmdLine) throws IOException, InterruptedException {
+        if (StringUtils.isNotBlank(cmdLine)) {
+            listener.getLogger().println("Executing script '" + cmdLine + "' on " + c.getName());
+            Node node = c.getNode();
+            Launcher launcher = root.createLauncher(listener);
+            Shell s = new Shell(cmdLine);
+            FilePath script = s.createScriptFile(root);
+            int r = launcher.launch().cmds(s.buildCommandLine(script)).envs(getEnvironment(node)).stdout(listener).pwd(root).join();
+
+            if (r != 0) {
+                listener.getLogger().println("script failed!");
+                throw new AbortException("script failed!");
+            }
+
+            listener.getLogger().println("script executed successfully.");
+        }
+    }
+    
     /**
      * Returns 0 if all prepare scripts were executed without error.
      *
@@ -47,5 +65,16 @@ public class SetupDeployer {
                 }
             }
         }
+    }
+    
+    /**
+     * Returns the environment variables for the given node.
+     *
+     * @param node node to get the environment variables from
+     * @return the environment variables for the given node
+     */
+    private EnvVars getEnvironment(Node node) {
+        EnvironmentVariablesNodeProperty env = node.getNodeProperties().get(EnvironmentVariablesNodeProperty.class);
+        return env != null ? env.getEnvVars() : new EnvVars();
     }
 }
